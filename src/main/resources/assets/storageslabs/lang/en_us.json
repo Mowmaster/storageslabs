@@ -1,0 +1,13 @@
+{
+  "itemGroup.storageslabs": "Example Mod Tab",
+  "block.storageslabs.example_block": "Example Block",
+  "item.storageslabs.example_item": "Example Item",
+
+  "storageslabs.configuration.title": "storageslabs Configs",
+  "storageslabs.configuration.section.storageslabs.common.toml": "storageslabs Configs",
+  "storageslabs.configuration.section.storageslabs.common.toml.title": "storageslabs Configs",
+  "storageslabs.configuration.items": "Item List",
+  "storageslabs.configuration.logDirtBlock": "Log Dirt Block",
+  "storageslabs.configuration.magicNumberIntroduction": "Magic Number Text",
+  "storageslabs.configuration.magicNumber": "Magic Number"
+}

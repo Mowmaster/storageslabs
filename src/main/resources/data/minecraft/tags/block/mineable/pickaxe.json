@@ -1,0 +1,7 @@
+{
+  "values": [
+    "storageslabs:slab_single",
+    "storageslabs:slab_compacting",
+    "storageslabs:slab_grid"
+  ]
+}

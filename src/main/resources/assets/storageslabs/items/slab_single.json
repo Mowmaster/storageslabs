@@ -1,0 +1,14 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "storageslabs:block/slab_1",
+    "tints": [
+      {
+        "type": "storageslabs:slab_body"
+      },
+      {
+        "type": "storageslabs:slab_band"
+      }
+    ]
+  }
+}

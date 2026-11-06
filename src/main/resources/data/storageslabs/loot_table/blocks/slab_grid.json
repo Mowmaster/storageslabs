@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "storageslabs:slab_grid",
+          "modifier": {
+            "type": "minecraft:copy_components",
+            "source": "block_entity",
+            "include": [
+              "minecraft:dyed_color",
+              "storageslabs:tier",
+              "storageslabs:slab_contents",
+              "mowlib:held_filter",
+              "mowlib:compacting_contents"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "random_sequence": "storageslabs:blocks/slab_grid"
+}

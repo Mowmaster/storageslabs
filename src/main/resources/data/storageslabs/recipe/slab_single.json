@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": "#minecraft:bundles",
+    "C": "minecraft:chest"
+  },
+  "pattern": [
+    "CBC"
+  ],
+  "result": {
+    "id": "storageslabs:slab_single"
+  }
+}

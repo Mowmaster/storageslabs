@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=up": {
+      "model": "storageslabs:block/slab_3"
+    },
+    "facing=down": {
+      "model": "storageslabs:block/slab_3",
+      "x": 180
+    },
+    "facing=north": {
+      "model": "storageslabs:block/slab_3",
+      "x": 90
+    },
+    "facing=east": {
+      "model": "storageslabs:block/slab_3",
+      "x": 90,
+      "y": 90
+    },
+    "facing=south": {
+      "model": "storageslabs:block/slab_3",
+      "x": 90,
+      "y": 180
+    },
+    "facing=west": {
+      "model": "storageslabs:block/slab_3",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

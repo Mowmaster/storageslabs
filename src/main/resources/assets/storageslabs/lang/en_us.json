@@ -1,13 +1,26 @@
 {
-  "itemGroup.storageslabs": "Example Mod Tab",
-  "block.storageslabs.example_block": "Example Block",
-  "item.storageslabs.example_item": "Example Item",
+  "itemGroup.storageslabs": "Storage Slabs",
 
-  "storageslabs.configuration.title": "storageslabs Configs",
-  "storageslabs.configuration.section.storageslabs.common.toml": "storageslabs Configs",
-  "storageslabs.configuration.section.storageslabs.common.toml.title": "storageslabs Configs",
-  "storageslabs.configuration.items": "Item List",
-  "storageslabs.configuration.logDirtBlock": "Log Dirt Block",
-  "storageslabs.configuration.magicNumberIntroduction": "Magic Number Text",
-  "storageslabs.configuration.magicNumber": "Magic Number"
+  "block.storageslabs.slab_single": "Storage Slab",
+  "block.storageslabs.slab_compacting": "Compacting Storage Slab",
+  "block.storageslabs.slab_grid": "Grid Storage Slab",
+
+  "tier.storageslabs.base": "Stone",
+  "tier.storageslabs.copper": "Copper",
+  "tier.storageslabs.iron": "Iron",
+  "tier.storageslabs.gold": "Gold",
+  "tier.storageslabs.diamond": "Diamond",
+  "tier.storageslabs.netherite": "Netherite",
+  "tier.storageslabs.star": "Nether Star",
+
+  "tooltip.storageslabs.tier": "Tier: %s",
+  "tooltip.storageslabs.capacity": "%s slot(s), %s items each",
+  "tooltip.storageslabs.capacity_compacting": "Compacting: %2$s of the top tier",
+  "tooltip.storageslabs.slot": "%s %s",
+  "tooltip.storageslabs.more": "...and %s more",
+  "tooltip.storageslabs.filter_whitelist": "Whitelist: %s",
+  "tooltip.storageslabs.filter_blacklist": "Blacklist: %s",
+
+  "message.storageslabs.empty_slot": "Empty",
+  "message.storageslabs.filter_present": "This slab already has a filter"
 }

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": "#minecraft:bundles",
+    "P": "minecraft:piston"
+  },
+  "pattern": [
+    "BPB"
+  ],
+  "result": {
+    "id": "storageslabs:slab_compacting"
+  }
+}

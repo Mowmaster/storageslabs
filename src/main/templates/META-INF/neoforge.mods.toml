@@ -83,7 +83,7 @@ A storage mod using slabs to store items with manual interactions
 [[dependencies.${mod_id}]]
 modId="mowlib"
 type="required"
-versionRange="[0.0.4,1.0.0)"
+versionRange="[0.0.5,1.0.0)"
 ordering="AFTER"
 side="BOTH"
 

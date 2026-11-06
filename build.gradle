@@ -142,7 +142,7 @@ dependencies {
     jarJar(implementation(group: 'com.mowmaster.mowlib', name: 'mowlib')) {
         version {
             strictly '[0.0.4,1.0.0)'
-            prefer '0.0.4'
+            prefer '0.0.5'
         }
     }
 }

@@ -1,9 +1,10 @@
 package com.mowmaster.storageslabs.item;
 
+import com.mowmaster.mowlib.compacting.Compacting;
 import com.mowmaster.mowlib.compacting.CompactingContents;
+import com.mowmaster.mowlib.compacting.ICompactingItem;
 import com.mowmaster.mowlib.filter.HeldFilters;
 import com.mowmaster.mowlib.filter.ITransportFilter;
-import com.mowmaster.mowlib.registry.MowLibDataComponents;
 import com.mowmaster.mowlib.transport.TransportContents;
 import com.mowmaster.mowlib.transport.TransportType;
 import com.mowmaster.storageslabs.block.SlabKind;
@@ -61,8 +62,11 @@ public class StorageSlabItem extends BlockItem
         SlabTier tier = tierOf(stack);
         SlabKind kind = kind();
         tooltip.accept(Component.translatable("tooltip.storageslabs.tier", tier.displayName()).withStyle(ChatFormatting.GRAY));
-        String capacityKey = kind == SlabKind.COMPACTING ? "tooltip.storageslabs.capacity_compacting" : "tooltip.storageslabs.capacity";
-        tooltip.accept(Component.translatable(capacityKey, kind.slots(tier), kind.capacity(tier)).withStyle(ChatFormatting.GRAY));
+        // The compacting slab's capacity is in MowLib's compacting tooltip below
+        if (kind != SlabKind.COMPACTING)
+        {
+            tooltip.accept(Component.translatable("tooltip.storageslabs.capacity", kind.slots(tier), kind.capacity(tier)).withStyle(ChatFormatting.GRAY));
+        }
 
         ItemStack filter = HeldFilters.get(stack);
         if (filter.getItem() instanceof ITransportFilter transportFilter)
@@ -73,12 +77,11 @@ public class StorageSlabItem extends BlockItem
 
         if (kind == SlabKind.COMPACTING)
         {
-            CompactingContents contents = stack.get(MowLibDataComponents.COMPACTING_CONTENTS.get());
-            if (contents == null || !contents.isSet()) return;
-            // The top tier and how many of it the pool makes
-            int top = contents.size() - 1;
-            tooltip.accept(Component.translatable("tooltip.storageslabs.slot", contents.amount(top), contents.stack(top, 1).getHoverName())
-                    .withStyle(ChatFormatting.BLUE));
+            // MowLib's compacting lines: every tier's amount, top first, then "Holds up to 1728 Block of Iron" (or, empty,
+            // how to start one). withCapacity: an item upgraded in the crafting grid still carries its old capacity
+            // until it's placed, so show the tier's.
+            CompactingContents contents = ICompactingItem.contents(stack).withCapacity(kind.capacity(tier));
+            Compacting.tooltip(contents, kind.capacity(tier), tooltip);
             return;
         }
 

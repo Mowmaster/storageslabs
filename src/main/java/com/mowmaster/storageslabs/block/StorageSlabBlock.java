@@ -184,11 +184,20 @@ public class StorageSlabBlock extends Block implements IColorableBlock, SimpleWa
         return -1;
     }
 
-    // -1 / +1 for the 3x3's arrows, 0 for anything else
+    // -1 / +1 for the 3x3's arrows, 0 for anything else. MowLib's PageArrows#arrowAt only knows four-way (horizontal)
+    // blocks, so the six-way check is done here: the arrows' boxes (modelled facing up) are turned to the slab's
+    // facing with CBPixelBox#rotateFromUp, the same way the cells are.
+    // TODO MowLib (note only): PageArrows could offer this as arrowAtFromUp(facing, hit) for six-facing blocks.
     public int arrowAt(BlockState state, BlockHitResult hit)
     {
         PageArrows arrows = kind.arrows();
-        return arrows == null ? 0 : arrows.arrowAtFromUp(state.getValue(FACING), hit);
+        if (arrows == null) return 0;
+        Direction facing = state.getValue(FACING);
+        if (arrows.topOnly() && hit.getDirection() != facing) return 0;
+        Vec3 pixel = CBPixelBox.pixelInside(hit);
+        if (arrows.back().rotateFromUp(facing).contains(pixel)) return -1;
+        if (arrows.forward().rotateFromUp(facing).contains(pixel)) return 1;
+        return 0;
     }
 
     // ---- Right-click ----

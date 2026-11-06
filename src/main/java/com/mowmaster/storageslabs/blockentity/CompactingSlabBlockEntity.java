@@ -1,7 +1,6 @@
 package com.mowmaster.storageslabs.blockentity;
 
 import com.mowmaster.mowlib.compacting.CompactingContents;
-import com.mowmaster.mowlib.compacting.CompactingStorage;
 import com.mowmaster.mowlib.paging.IPageHolder;
 import com.mowmaster.mowlib.paging.PageText;
 import com.mowmaster.mowlib.registry.MowLibDataComponents;
@@ -9,6 +8,7 @@ import com.mowmaster.mowlib.storage.StorageInteractions;
 import com.mowmaster.mowlib.transport.TransportTypes;
 import com.mowmaster.storageslabs.block.SlabKind;
 import com.mowmaster.storageslabs.registry.SlabBlockEntities;
+import com.mowmaster.storageslabs.storage.CompactingSlabHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
@@ -24,18 +24,21 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 
-// The compacting slab: MowLib's CompactingStorage (moved there from Bibliomania's Compacting Book). One chain
-// (nugget -> ingot -> block), one pool; it holds kind().capacity(tier) of the chain's TOP tier (1728 iron blocks at
-// tier 0, Integer.MAX_VALUE at STAR).
+// The compacting slab: MowLib's CompactingContents (one chain, one pool) in a CompactingSlabHandler. It holds
+// kind().capacity(tier) of the chain's TOP tier (1728 iron blocks at tier 0, Integer.MAX_VALUE at STAR); the contents
+// carry that capacity, and an upgrade raises it.
 // The 3 cells show the chain highest tier first: the wide cell the top tier, then the next two. A chain of more than
-// 3 tiers is shown 3 at a time; its pages are MowLib's IPageHolder (page keys / scroll while looking at it).
+// 3 tiers is shown 3 at a time; the page is kept here (MowLib's contents page one tier at a time, like a book) and
+// turned through MowLib's IPageHolder (page keys / scroll while looking at it).
 // By hand: right-click puts the held item in (any tier of the chain, or starts a chain if empty; an empty hand puts in
 // every item of the chain from the inventory); left-click takes 1 of the clicked tier (sneak: a stack).
-public class CompactingSlabBlockEntity extends BaseSlabBlockEntity implements IPageHolder, CompactingStorage.Host
+public class CompactingSlabBlockEntity extends BaseSlabBlockEntity implements IPageHolder, CompactingSlabHandler.Host
 {
     private static final String TAG_CONTENTS = "compacting";
+    private static final String TAG_PAGE = "page";
 
-    private final CompactingStorage storage = new CompactingStorage(this);
+    private final CompactingSlabHandler storage = new CompactingSlabHandler(this);
+    private int page;
 
     public CompactingSlabBlockEntity(BlockPos pos, BlockState state)
     {
@@ -43,7 +46,7 @@ public class CompactingSlabBlockEntity extends BaseSlabBlockEntity implements IP
     }
 
     // For the item capability
-    public CompactingStorage storage()
+    public CompactingSlabHandler storage()
     {
         return storage;
     }
@@ -51,6 +54,12 @@ public class CompactingSlabBlockEntity extends BaseSlabBlockEntity implements IP
     public CompactingContents contents()
     {
         return storage.contents();
+    }
+
+    @Override
+    protected void onTierChanged()
+    {
+        storage.updateCapacity();
     }
 
     // The chain tier a cell shows on the open page (-1: none)
@@ -61,7 +70,7 @@ public class CompactingSlabBlockEntity extends BaseSlabBlockEntity implements IP
         return tier >= 0 && tier < contents.size() ? tier : -1;
     }
 
-    // ---- CompactingStorage.Host ----
+    // ---- CompactingSlabHandler.Host ----
 
     @Override
     public int compactingCapacity()
@@ -92,7 +101,7 @@ public class CompactingSlabBlockEntity extends BaseSlabBlockEntity implements IP
     @Override
     public float fullness()
     {
-        return storage.fullness();
+        return storage.contents().fullness();
     }
 
     @Override
@@ -129,6 +138,7 @@ public class CompactingSlabBlockEntity extends BaseSlabBlockEntity implements IP
             }
             if (inserted > 0) inventory.setChanged();
         }
+        page = Math.floorMod(page, getPageCount()); // a new chain may have fewer pages
         if (inserted > 0) level.playSound(null, worldPosition, SoundEvents.BUNDLE_INSERT, SoundSource.BLOCKS, 0.8f, 0.8f + 0.4f * fullness());
         else level.playSound(null, worldPosition, SoundEvents.BUNDLE_INSERT_FAIL, SoundSource.BLOCKS, 0.8f, 1f);
         report(player, Math.max(0, tierOf(cell)));
@@ -145,19 +155,20 @@ public class CompactingSlabBlockEntity extends BaseSlabBlockEntity implements IP
         StorageInteractions.giveToPlayer(player, taken);
         if (!taken.isEmpty()) level.playSound(null, worldPosition, SoundEvents.BUNDLE_REMOVE_ONE, SoundSource.BLOCKS, 0.8f, 0.8f + 0.4f * fullness());
         report(player, tier);
+        page = Math.floorMod(page, getPageCount()); // emptied: back to one page
         syncNow();
         return !taken.isEmpty();
     }
 
-    // "Iron Block: 12 / 1728" (top tier) or "Iron Ingot: 108 / 15552" over the hotbar
+    // "Iron Block: 12 / 1728" or "Iron Ingot: 108 / 15552" over the hotbar
     private void report(Player player, int tier)
     {
         CompactingContents contents = storage.contents();
         Component what;
-        if (!contents.isSet()) what = Component.translatable("message.storageslabs.empty_slot");
+        if (!contents.isSet() || tier >= contents.size()) what = Component.translatable("message.storageslabs.empty_slot");
         else
         {
-            long capacity = contents.maxTotal(compactingCapacity()) / contents.tiers().get(tier).value();
+            long capacity = contents.maxTotal() / contents.tiers().get(tier).value();
             what = TransportTypes.ITEMS.get().describeStored(contents.resource(tier), contents.amount(tier), Math.min(Integer.MAX_VALUE, capacity));
         }
         tell(player, getPageCount() > 1 ? PageText.line(getPage(), getPageCount(), what) : what);
@@ -175,22 +186,22 @@ public class CompactingSlabBlockEntity extends BaseSlabBlockEntity implements IP
     @Override
     public int getPage()
     {
-        return Math.floorMod(storage.contents().page(), getPageCount());
+        return Math.floorMod(page, getPageCount());
     }
 
     @Override
-    public void setPage(int page)
+    public void setPage(int newPage)
     {
-        storage.setPage(page, getPageCount());
+        page = Math.floorMod(newPage, getPageCount());
         syncNow();
     }
 
-    // ---- Block <-> item ----
+    // ---- Block <-> item: mowlib:compacting_contents ----
 
     @Override
     protected void applyImplicitComponents(DataComponentGetter components)
     {
-        super.applyImplicitComponents(components);
+        super.applyImplicitComponents(components); // sets the tier first, so the capacity is right
         CompactingContents contents = components.get(MowLibDataComponents.COMPACTING_CONTENTS.get());
         storage.load(contents == null ? CompactingContents.EMPTY : contents);
     }
@@ -209,6 +220,7 @@ public class CompactingSlabBlockEntity extends BaseSlabBlockEntity implements IP
     {
         super.saveAdditional(output);
         if (storage.contents().isSet()) output.store(TAG_CONTENTS, CompactingContents.CODEC, storage.contents());
+        output.putInt(TAG_PAGE, page);
     }
 
     @Override
@@ -216,5 +228,6 @@ public class CompactingSlabBlockEntity extends BaseSlabBlockEntity implements IP
     {
         super.loadAdditional(input);
         storage.load(input.read(TAG_CONTENTS, CompactingContents.CODEC).orElse(CompactingContents.EMPTY));
+        page = input.getIntOr(TAG_PAGE, 0);
     }
 }

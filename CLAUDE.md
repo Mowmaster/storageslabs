@@ -5,12 +5,23 @@ I copy code in myself, so give complete, clearly placed snippets.
 
 ## MowLib (shared library)
 - This mod depends on MowLib (mod id `mowlib`, package `com.mowmaster.mowlib`), bundled with Jar-in-Jar from
-  mavenLocal (`com.mowmaster.mowlib:mowlib`, range `[0.0.4,1.0.0)`). Source: `Mowmaster/MowLib`, branch
-  `NeoForge-26x`; the version this project builds against is the tag matching `prefer` in build.gradle.
+  mavenLocal as `com.mowmaster.mowlib:mowlib-${minecraft_version}` (range `[0.0.4,1.0.0)`). Source:
+  `Mowmaster/MowLib`, branch `NeoForge-26x`; the version this project builds against is the tag matching `prefer` in
+  build.gradle.
+- MowLib builds for two Minecraft versions from one set of sources with Stonecutter: 26.3 (NeoForge 26.3.0.94) and
+  26.1.2 (NeoForge 26.1.2.122). Each is published under its own Maven name (`mowlib-26.3`, `mowlib-26.1.2`); the old
+  name `com.mowmaster.mowlib:mowlib` is gone. This mod is still 26.3 only (not on Stonecutter yet).
+- When updating MowLib, read the "Check" lines in its CHANGELOG.md for every version since the one this mod used, and
+  its CLAUDE.md "Versions (Stonecutter)" section.
 - Before writing a shared system (tinting, storage, filters, transport, paging, dual handed crafting, bonus drops, tooltips,
   renderers...), clone MowLib and check whether it already exists there. Use it; don't copy it into this mod.
-- Don't edit MowLib from this project's session. If something belongs in MowLib, or MowLib needs a change, write
-  it up as a `mowlib-from-<mod id>.zip` (MowLib files + notes + migration), the same way as before.
+- Don't edit MowLib (or any other project) from this project's session, and don't make change files for it: every
+  zip is for this mod alone. If something belongs in MowLib, suggest it and leave a TODO note (in code or here); I'll
+  ask for an extraction when I want one.
+- If I do ask for a `mowlib-from-<mod id>.zip` extraction (MowLib files + NOTES.md + migration), its code must compile
+  for 26.1.2 as well as 26.3. Where it uses an API that differs between them, say so in NOTES.md and give the 26.1.2
+  version if known, so the MowLib session can add a Stonecutter version comment (MowLib's CLAUDE.md lists the
+  differences it already handles; 26.1.2's API is in NeoForge's `26.1.x` branch and the 26.2/26.3 primers).
 - MowLib's CLAUDE.md lists what it contains and its rules.
 
 ## Working with Claude

@@ -10,9 +10,11 @@ I copy code in myself, so give complete, clearly placed snippets.
   build.gradle.
 - MowLib builds for two Minecraft versions from one set of sources with Stonecutter: 26.3 (NeoForge 26.3.0.94) and
   26.1.2 (NeoForge 26.1.2.122). Each is published under its own Maven name (`mowlib-26.3`, `mowlib-26.1.2`); the old
-  name `com.mowmaster.mowlib:mowlib` is gone. This mod is still 26.3 only (not on Stonecutter yet).
-- When updating MowLib, read the "Check" lines in its CHANGELOG.md for every version since the one this mod used, and
-  its CLAUDE.md "Versions (Stonecutter)" section.
+  name `com.mowmaster.mowlib:mowlib` is gone.
+- This mod is 26.3 only and does not use Stonecutter (it may later, only if enough players ask for other versions).
+  Don't add Stonecutter version comments or suggest converting it.
+- When updating MowLib, read the "Check" lines in its CHANGELOG.md for every version since the one this mod used.
+  Check lines that only affect 26.1.2 don't apply to this mod.
 - Before writing a shared system (tinting, storage, filters, transport, paging, dual handed crafting, bonus drops, tooltips,
   renderers...), clone MowLib and check whether it already exists there. Use it; don't copy it into this mod.
 - Don't edit MowLib (or any other project) from this project's session, and don't make change files for it: every
